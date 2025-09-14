@@ -79,6 +79,7 @@ ConVar tf_movement_lost_footing_friction( "tf_movement_lost_footing_friction", "
 ConVar tfft_autojump("tfft_autojump", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Automatically jump while holding the jump button down");
 ConVar tfft_duckjump("tfft_duckjump", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Toggles jumping while ducked");
 ConVar tfft_allowbunnyhopping("tfft_allowbunnyhopping", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Removes anti-bhop patch");
+ConVar tfft_airjump("tfft_airjump", "0", FCVAR_NOTIFY | FCVAR_REPLICATED, "Allows all classes to jump in the air infinitely");
 
 extern ConVar cl_forwardspeed;
 extern ConVar cl_backspeed;
@@ -1062,8 +1063,10 @@ void CTFGameMovement::AirDash( void )
 #endif
 	}
 
+	if ( !tfft_airjump.GetBool() )
+	{
 	m_pTFPlayer->m_Shared.SetAirDash( iAirDash+1 );
-
+	}
 	// Play the gesture.
  	m_pTFPlayer->DoAnimationEvent( PLAYERANIMEVENT_DOUBLEJUMP );
 #ifdef GAME_DLL
@@ -1248,7 +1251,7 @@ bool CTFGameMovement::CheckJumpButton()
 	// (unless you are a scout or ghost or parachute
 	if ( !bOnGround )
 	{
-		if ( m_pTFPlayer->CanAirDash() )
+		if ( m_pTFPlayer->CanAirDash() || tfft_airjump.GetBool() )
 		{
 			bAirDash = true;
 		}
