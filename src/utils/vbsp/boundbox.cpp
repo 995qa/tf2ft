@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "vbsp.h"
-#include "boundbox.h"
+#include "BoundBox.h"
 //#include "hammer_mathlib.h"
 //#include "MapDefs.h"
 

@@ -11,7 +11,7 @@
 #endif
 
 
-#include "chunkfile.h"
+#include "ChunkFile.h"
 #include "bsplib.h"
 #include "cmdlib.h"
 

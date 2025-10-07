@@ -10,9 +10,9 @@
 #pragma once
 #endif
 
-#include "helperinfo.h"
-#include "gamedata.h"
-#include "gdclass.h"
-#include "inputoutput.h"
+#include "HelperInfo.h"
+#include "GameData.h"
+#include "GDClass.h"
+#include "InputOutput.h"
 
 #endif // FGDLIB_H

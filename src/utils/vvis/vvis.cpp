@@ -7,6 +7,7 @@
 //=============================================================================//
 // vis.c
 
+#include <windows.h>
 #include "vis.h"
 #include "threads.h"
 #include "stdlib.h"
@@ -83,7 +84,7 @@ winding_t *NewWinding (int points)
 	if (points > MAX_POINTS_ON_WINDING)
 		Error ("NewWinding: %i points, max %d", points, MAX_POINTS_ON_WINDING);
 	
-	size = sizeof ( Vector *) * points;
+	size = (int)(&((winding_t *)0)->points[points]);
 	w = (winding_t*)malloc (size);
 	memset (w, 0, size);
 	
@@ -958,12 +959,10 @@ int ParseCommandLine( int argc, char **argv )
 		{
 			g_bLowPriority = true;
 		}
-#ifdef WIN32
 		else if ( !Q_stricmp( argv[i], "-FullMinidumps" ) )
 		{
 			EnableFullMinidumps( true );
 		}
-#endif
 		else if ( !Q_stricmp( argv[i], CMDLINEOPTION_NOVCONFIG ) )
 		{
 		}
@@ -1247,11 +1246,9 @@ int main (int argc, char **argv)
 		SetupToolsMinidumpHandler( VMPI_ExceptionFilter );
 	else
 #endif
-#ifdef WIN32
 	{
 		SetupDefaultToolsMinidumpHandler();
 	}
-#endif
 
 	return RunVVis( argc, argv );
 }

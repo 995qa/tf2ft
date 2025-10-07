@@ -94,8 +94,7 @@ bool g_bOnlyStaticProps = false;
 bool g_bShowStaticPropNormals = false;
 
 
-// Underscore to avoid conflicting with the `gamme` function from GNU libm
-float		gamma_ = 0.5;
+float		gamma = 0.5;
 float		indirect_sun = 1.0;
 float		reflectivityScale = 1.0;
 qboolean	do_extra = true;
@@ -2171,11 +2170,7 @@ void VRAD_LoadBSP( char const *pFilename )
 		// Otherwise, try looking in the BIN directory from which we were run from
 		Msg( "Could not find lights.rad in %s.\nTrying VRAD BIN directory instead...\n", 
 			    global_lights );
-#ifdef WIN32
 		GetModuleFileName( NULL, global_lights, sizeof( global_lights ) );
-#elif defined(POSIX)
-		readlink( "/proc/self/exe", global_lights, sizeof( global_lights ) );
-#endif
 		Q_ExtractFilePath( global_lights, global_lights, sizeof( global_lights ) );
 		strcat( global_lights, "lights.rad" );
 	}
@@ -2634,12 +2629,10 @@ int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		{
 			++i;
 		}
-#ifdef WIN32
 		else if ( !Q_stricmp( argv[i], "-FullMinidumps" ) )
 		{
 			EnableFullMinidumps( true );
 		}
-#endif
 		else if ( !Q_stricmp( argv[i], "-hdr" ) )
 		{
 			SetHDRMode( true );
@@ -2996,9 +2989,7 @@ int VRAD_Main(int argc, char **argv)
 #endif
 	{
 		LoadCmdLineFromFile( argc, argv, source, "vrad" ); // Don't do this if we're a VMPI worker..
-#ifdef WIN32
 		SetupDefaultToolsMinidumpHandler();
-#endif
 	}
 	
 	return RunVRAD( argc, argv );

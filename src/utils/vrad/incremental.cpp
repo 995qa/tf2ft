@@ -310,9 +310,10 @@ void CIncremental::AddLightToFace(
 	else
 	{
 		bool bNew;
-		pLight->m_CS.Lock();
-		pFace = pLight->FindOrCreateLightFace( iFace, lmSize, &bNew );
-		pLight->m_CS.Unlock();
+		
+		EnterCriticalSection( &pLight->m_CS );
+			pFace = pLight->FindOrCreateLightFace( iFace, lmSize, &bNew );
+		LeaveCriticalSection( &pLight->m_CS );
 
 		pLight->m_pCachedFaces[iThread] = pFace;
 
@@ -459,10 +460,10 @@ void CIncremental::FinishFace(
 		if( pFace->m_CompressedData.TellPut() == 0 )
 		{
 			// No contribution.. delete this face from the light.
-			pLight->m_CS.Lock();
+			EnterCriticalSection( &pLight->m_CS );
 				pLight->m_LightFaces.Remove( pFace->m_LightFacesIndex );
 				delete pFace;
-			pLight->m_CS.Unlock();
+			LeaveCriticalSection( &pLight->m_CS );
 		}
 		else
 		{
@@ -718,12 +719,14 @@ void CIncremental::LinkLightsToFaces( CUtlVector<CFaceLightList> &faceLights )
 CIncLight::CIncLight()
 {
 	memset( m_pCachedFaces, 0, sizeof(m_pCachedFaces) );
+	InitializeCriticalSection( &m_CS );
 }
 
 
 CIncLight::~CIncLight()
 {
 	m_LightFaces.PurgeAndDeleteElements();
+	DeleteCriticalSection( &m_CS );
 }
 
 

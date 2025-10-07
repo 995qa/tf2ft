@@ -15,8 +15,10 @@
 #include <cmdlib.h>
 #include "utilmatlib.h"
 #include "tier0/dbg.h"
+#include <windows.h>
+#include "filesystem.h"
 #include "materialsystem/materialsystem_config.h"
-#include "mathlib/mathlib.h"
+#include "mathlib/Mathlib.h"
 
 void LoadMaterialSystemInterface( CreateInterfaceFn fileSystemFactory )
 {

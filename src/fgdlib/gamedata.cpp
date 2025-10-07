@@ -2,10 +2,12 @@
 //
 //=============================================================================
 
+#include <windows.h>
 #include <tier0/dbg.h>
-#include "worldsize.h"
-#include "fgdlib/gamedata.h"
-#include "fgdlib/helperinfo.h"
+#include <io.h>
+#include <WorldSize.h>
+#include "fgdlib/GameData.h"
+#include "fgdlib/HelperInfo.h"
 #include "KeyValues.h"
 #include "filesystem_tools.h"
 #include "tier1/strtools.h"
@@ -277,6 +279,9 @@ void GameData::ClearData(void)
 BOOL GameData::Load(const char *pszFilename)
 {
 	TokenReader tr;
+
+	if(GetFileAttributes(pszFilename) == 0xffffffff)
+		return FALSE;
 
 	if(!tr.Open(pszFilename))
 		return FALSE;

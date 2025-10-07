@@ -10,7 +10,7 @@
 
 
 #include <utlvector.h>
-#include "fgdlib/entitydefs.h"
+#include "fgdlib/EntityDefs.h"
 
 
 enum InputOutputType_t

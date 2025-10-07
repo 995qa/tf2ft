@@ -14,16 +14,19 @@
 #pragma warning(disable:4701 4702 4530)
 #include <fstream>
 #pragma warning(pop)
-#include "tokenreader.h"
-#include "gdclass.h"
-#include "inputoutput.h"
-#include "utlstring.h"
+#include "TokenReader.h"
+#include "GDClass.h"
+#include "InputOutput.h"
+#include "UtlString.h"
 #include "utlvector.h"
 
 
 class MDkeyvalue;
 class GameData;
 class KeyValues;
+
+enum TEXTUREFORMAT;
+
 
 typedef void (*GameDataMessageFunc_t)(int level, PRINTF_FORMAT_STRING const char *fmt, ...);
 
