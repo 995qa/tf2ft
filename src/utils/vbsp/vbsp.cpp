@@ -1133,12 +1133,10 @@ int RunVBSP( int argc, char **argv )
 		{
 			g_NodrawTriggers = true;
 		}
-#ifdef WIN32
 		else if ( !Q_stricmp( argv[i], "-FullMinidumps" ) )
 		{
 			EnableFullMinidumps( true );
 		}
-#endif
 		else if ( !Q_stricmp( argv[i], "-embed" ) && i < argc - 1 )
 		{
 			V_MakeAbsolutePath( g_szEmbedDir, sizeof( g_szEmbedDir ), argv[++i], "." );
@@ -1437,10 +1435,8 @@ main
 */
 int main (int argc, char **argv)
 {
-#ifdef WIN32
 	// Install an exception handler.
 	SetupDefaultToolsMinidumpHandler();
-#endif
 	return RunVBSP( argc, argv );
 }
 

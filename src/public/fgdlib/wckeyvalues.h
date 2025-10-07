@@ -123,8 +123,11 @@ public:
 	// Special function used for non-unique keyvalue lists.
 	void AddKeyValue(const char *pszKey, const char *pszValue);
 
-public:
+protected:
+
 	void InsertKeyValue( const MDkeyvalue &kv );
+
+protected:
 	CUtlVector<MDkeyvalue> m_KeyValues;
 };
 
@@ -142,8 +145,10 @@ public:
 	int FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
 	void RemoveKeyAt(int nIndex);
 
-public:
+protected:
 	void InsertKeyValue( const MDkeyvalue &kv );
+
+protected:
 	CUtlDict<MDkeyvalue,unsigned short> m_KeyValues;
 };
 
@@ -183,7 +188,7 @@ typedef WCKeyValuesT<WCKVBase_Vector> WCKeyValuesVector;
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetKey(int nIndex) const
 {
-	return(((Base*) this)->m_KeyValues.Element(nIndex).szKey);
+	return(m_KeyValues.Element(nIndex).szKey);
 }
 
 
@@ -195,7 +200,7 @@ inline const char *WCKeyValuesT<Base>::GetKey(int nIndex) const
 template<class Base>
 inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(int nIndex)
 {
-	return(((Base*) this)->m_KeyValues.Element(nIndex));
+	return(m_KeyValues.Element(nIndex));
 }
 
 
@@ -207,7 +212,7 @@ inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(int nIndex)
 template<class Base>
 inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(int nIndex) const
 {
-	return(((Base*) this)->m_KeyValues.Element(nIndex));
+	return(m_KeyValues.Element(nIndex));
 }
 
 
@@ -218,7 +223,7 @@ inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(int nIndex) const
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetValue(int nIndex) const
 {
-	return(((Base*) this)->m_KeyValues.Element(nIndex).szValue);
+	return(m_KeyValues.Element(nIndex).szValue);
 }
 
 

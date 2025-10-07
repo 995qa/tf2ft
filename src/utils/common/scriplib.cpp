@@ -16,7 +16,7 @@
 #include "xbox\xbox_win32stubs.h"
 #endif
 #if defined(POSIX)
-#include <dirent.h>
+#include "../../filesystem/linux_support.h"
 #include <sys/stat.h>
 #endif
 /*
@@ -1219,38 +1219,39 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 
 	_findclose( h );
 #elif defined(POSIX)
-	struct dirent *dp;
+	FIND_DATA findData;
 	Q_FixSlashes( fullPath );
-	DIR *dfd = opendir( fullPath );
-	if ( dfd == nullptr )
+	void *h = FindFirstFile( fullPath, &findData );
+	if ( (intp)h == -1 )
 	{
 		return 0;
 	}
 
-	while ( (dp = readdir(dfd)) != nullptr )
+	do
 	{
+		// dos attribute complexities i.e. _A_NORMAL is 0
 		if ( bFindDirs )
 		{
 			// skip non dirs
-			if ( !( dp->d_type != DT_DIR ) )
+			if ( !( findData.dwFileAttributes & S_IFDIR ) )
 				continue;
 		}
 		else
 		{
 			// skip dirs
-			if ( dp->d_type == DT_DIR )
+			if ( findData.dwFileAttributes & S_IFDIR )
 				continue;
 		}
 
-		if ( !stricmp( dp->d_name, "." ) )
+		if ( !stricmp( findData.cFileName, "." ) )
 			continue;
 
-		if ( !stricmp( dp->d_name, ".." ) )
+		if ( !stricmp( findData.cFileName, ".." ) )
 			continue;
 
 		char fileName[MAX_PATH];
 		strcpy( fileName, sourcePath );
-		strcat( fileName, dp->d_name );
+		strcat( fileName, findData.cFileName );
 
 		int j = fileList.AddToTail();
 		fileList[j].fileName.Set( fileName );
@@ -1264,8 +1265,9 @@ int CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVec
 		else
 			fileList[j].timeWrite = 0;
 	}
+	while ( !FindNextFile( h, &findData ) );
 
-	closedir( dfd );
+	FindClose( h );
 
 #else
 #error

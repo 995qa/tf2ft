@@ -14,7 +14,7 @@
 #include "tier0/icommandline.h"
 #include "utldict.h"
 #include <windows.h>
-#include "utlbuffer.h"
+#include "UtlBuffer.h"
 #include "utlsymbol.h"
 
 bool g_quiet = false;

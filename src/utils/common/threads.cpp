@@ -13,6 +13,7 @@
 
 #define	USED
 
+#include <windows.h>
 #include "cmdlib.h"
 #define NO_THREAD_NAMES
 #include "threads.h"
@@ -20,13 +21,6 @@
 
 #define	MAX_THREADS	16
 
-#if !defined(WIN32) && !defined(POSIX)
-#error "threads.cpp is not supported on this platform"
-#endif
-
-#ifdef POSIX
-#include <sys/sysinfo.h>
-#endif
 
 class CRunThreadsData
 {
@@ -46,11 +40,7 @@ qboolean		pacifier;
 qboolean	threaded;
 bool g_bLowPriorityThreads = false;
 
-#ifdef WIN32
 HANDLE g_ThreadHandles[MAX_THREADS];
-#elif defined(POSIX)
-pthread_t g_ThreadHandles[MAX_THREADS];
-#endif
 
 
 
@@ -93,6 +83,7 @@ void ThreadWorkerFunction( int iThread, void *pUserData )
 		work = GetThreadWork ();
 		if (work == -1)
 			break;
+		 
 		workfunction( iThread, work );
 	}
 }
@@ -101,6 +92,7 @@ void RunThreadsOnIndividual (int workcnt, qboolean showpacifier, ThreadWorkerFn 
 {
 	if (numthreads == -1)
 		ThreadSetDefault ();
+	
 	workfunction = func;
 	RunThreadsOn (workcnt, showpacifier, ThreadWorkerFunction);
 }
@@ -115,33 +107,35 @@ WIN32
 */
 
 int		numthreads = -1;
-CThreadMutex mutex;
+CRITICAL_SECTION		crit;
 static int enter;
+
+
+class CCritInit
+{
+public:
+	CCritInit()
+	{
+		InitializeCriticalSection (&crit);
+	}
+} g_CritInit;
+
+
 
 void SetLowPriority()
 {
-#ifdef WIN32
 	SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
-#elif defined(POSIX)
-	struct sched_param p {};
-	p.sched_priority = 0;
-	sched_setscheduler ( 0, SCHED_IDLE, &p );
-#endif
 }
 
 
 void ThreadSetDefault (void)
 {
+	SYSTEM_INFO info;
 
 	if (numthreads == -1)	// not set manually
 	{
-#ifdef WIN32
-		SYSTEM_INFO info;
 		GetSystemInfo (&info);
 		numthreads = info.dwNumberOfProcessors;
-#elif defined(POSIX)
-		numthreads = get_nprocs();
-#endif
 		if (numthreads < 1 || numthreads > 32)
 			numthreads = 1;
 	}
@@ -154,7 +148,7 @@ void ThreadLock (void)
 {
 	if (!threaded)
 		return;
-	mutex.Lock();
+	EnterCriticalSection (&crit);
 	if (enter)
 		Error ("Recursive ThreadLock\n");
 	enter = 1;
@@ -167,15 +161,12 @@ void ThreadUnlock (void)
 	if (!enter)
 		Error ("ThreadUnlock without lock\n");
 	enter = 0;
-	mutex.Unlock();
+	LeaveCriticalSection (&crit);
 }
 
+
 // This runs in the thread and dispatches a RunThreadsFn call.
-#ifdef WIN32
 DWORD WINAPI InternalRunThreadsFn( LPVOID pParameter )
-#elif defined(POSIX)
-void *InternalRunThreadsFn( void *pParameter )
-#endif
 {
 	CRunThreadsData *pData = (CRunThreadsData*)pParameter;
 	pData->m_Fn( pData->m_iThread, pData->m_pUserData );
@@ -196,7 +187,7 @@ void RunThreads_Start( RunThreadsFn fn, void *pUserData, ERunThreadsPriority ePr
 		g_RunThreadsData[i].m_iThread = i;
 		g_RunThreadsData[i].m_pUserData = pUserData;
 		g_RunThreadsData[i].m_Fn = fn;
-#ifdef WIN32
+
 		DWORD dwDummy;
 		g_ThreadHandles[i] = CreateThread(
 		   NULL,	// LPSECURITY_ATTRIBUTES lpsa,
@@ -215,25 +206,19 @@ void RunThreads_Start( RunThreadsFn fn, void *pUserData, ERunThreadsPriority ePr
 		{
 			SetThreadPriority( g_ThreadHandles[i], THREAD_PRIORITY_IDLE );
 		}
-#elif defined(POSIX)
-		pthread_create( &g_ThreadHandles[i], nullptr, InternalRunThreadsFn, &g_RunThreadsData[i] );
-#endif
 	}
 }
 
 
 void RunThreads_End()
 {
-#ifdef WIN32
 	WaitForMultipleObjects( numthreads, g_ThreadHandles, TRUE, INFINITE );
 	for ( int i=0; i < numthreads; i++ )
 		CloseHandle( g_ThreadHandles[i] );
-#elif defined(POSIX)
-	for ( int i=0; i < numthreads; i++ )
-		pthread_join(g_ThreadHandles[i], nullptr);
-#endif
+
 	threaded = false;
 }
+	
 
 /*
 =============

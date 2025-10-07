@@ -11,16 +11,16 @@
 
 #include "vrad.h"
 #include "mathlib/vector.h"
-#include "utlbuffer.h"
+#include "UtlBuffer.h"
 #include "utlvector.h"
-#include "gamebspfile.h"
-#include "bsptreedata.h"
-#include "vphysics_interface.h"
-#include "studio.h"
-#include "optimize.h"
-#include "bsplib.h"
-#include "cmodel.h"
-#include "physdll.h"
+#include "GameBSPFile.h"
+#include "BSPTreeData.h"
+#include "VPhysics_Interface.h"
+#include "Studio.h"
+#include "Optimize.h"
+#include "Bsplib.h"
+#include "CModel.h"
+#include "PhysDll.h"
 #include "phyfile.h"
 #include "collisionutils.h"
 #include "tier1/KeyValues.h"
@@ -165,8 +165,8 @@ void Rasterizer::Build()
 		return;
 
 	// Clamp to 0..1
-	fMinX = max(0.0f, fMinX);
-	fMinY = max(0.0f, fMinY);
+	fMinX = max(0, fMinX);
+	fMinY = max(0, fMinY);
 	fMaxX = min(1.0f, fMaxX);
 	fMaxY = min(1.0f, fMaxY);
 
@@ -176,8 +176,8 @@ void Rasterizer::Build()
 
 	int iMinX = GetCol(fMinX) - kFilterSampleRadius;
 	int iMinY = GetRow(fMinY) - kFilterSampleRadius;
-	size_t iMaxX = GetCol(fMaxX) + 1 + kFilterSampleRadius;
-	size_t iMaxY = GetRow(fMaxY) + 1 + kFilterSampleRadius;
+	int iMaxX = GetCol(fMaxX) + 1 + kFilterSampleRadius;
+	int iMaxY = GetRow(fMaxY) + 1 + kFilterSampleRadius;
 
 	// Clamp to valid texture (integer) locations
 	iMinX = max(0, iMinX);
@@ -1202,9 +1202,8 @@ void ComputeDirectLightingAtPoint( Vector &position, Vector &normal, Vector &out
 
 		GatherSampleLightSSE( sampleOutput, dl, -1, adjusted_pos4, &normal4, 1, iThread, nLFlags | GATHERLFLAGS_FORCE_FAST,
 		                      static_prop_id_to_skip, flEpsilon );
-
-		float scale = SubFloat( sampleOutput.m_flFalloff, 0 ) * SubFloat( sampleOutput.m_flDot[0], 0 );
-		VectorMA( outColor, scale, dl->light.intensity, outColor );
+		
+		VectorMA( outColor, sampleOutput.m_flFalloff.m128_f32[0] * sampleOutput.m_flDot[0].m128_f32[0], dl->light.intensity, outColor );
 	}
 }
 
@@ -1558,7 +1557,7 @@ void CVradStaticPropMgr::SerializeLighting()
 
 		// align to start of vertex data
 		unsigned char *pVertexData = (unsigned char *)(sizeof( HardwareVerts::FileHeader_t ) + m_StaticProps[i].m_MeshData.Count()*sizeof(HardwareVerts::MeshHeader_t));
-		pVertexData = (unsigned char*)pVhvHdr + ALIGN_TO_POW2( (unsigned long long)pVertexData, 512 );
+		pVertexData = (unsigned char*)pVhvHdr + ALIGN_TO_POW2( (unsigned int)pVertexData, 512 );
 		
 		// construct header
 		pVhvHdr->m_nVersion     = VHV_VERSION;
@@ -1574,7 +1573,7 @@ void CVradStaticPropMgr::SerializeLighting()
 			HardwareVerts::MeshHeader_t *pMesh = pVhvHdr->pMesh( n );
 			pMesh->m_nLod      = m_StaticProps[i].m_MeshData[n].m_nLod;
 			pMesh->m_nVertexes = m_StaticProps[i].m_MeshData[n].m_VertexColors.Count();
-			pMesh->m_nOffset   = (unsigned long long)pVertexData - (unsigned long long)pVhvHdr;
+			pMesh->m_nOffset   = (unsigned int)pVertexData - (unsigned int)pVhvHdr; 
 
 			// construct vertexes
 			for (int k=0; k<pMesh->m_nVertexes; k++)
@@ -1596,8 +1595,8 @@ void CVradStaticPropMgr::SerializeLighting()
 		}
 
 		// align to end of file
-		pVertexData = (unsigned char *)((unsigned long long)pVertexData - (unsigned long long)pVhvHdr);
-		pVertexData = (unsigned char*)pVhvHdr + ALIGN_TO_POW2( (unsigned long long)pVertexData, 512 );
+		pVertexData = (unsigned char *)((unsigned int)pVertexData - (unsigned int)pVhvHdr);
+		pVertexData = (unsigned char*)pVhvHdr + ALIGN_TO_POW2( (unsigned int)pVertexData, 512 );
 
 		AddBufferToPak( GetPakFile(), filename, (void*)pVhvHdr, pVertexData - (unsigned char*)pVhvHdr, false );
 	}
@@ -1633,7 +1632,7 @@ void CVradStaticPropMgr::SerializeLighting()
 
 		// align start of texel data
 		unsigned char *pTexelData = (unsigned char *)(sizeof(HardwareTexels::FileHeader_t) + m_StaticProps[i].m_MeshData.Count() * sizeof(HardwareTexels::MeshHeader_t));
-		pTexelData = (unsigned char*)pVhtHdr + ALIGN_TO_POW2((unsigned long long)pTexelData, kAlignment);
+		pTexelData = (unsigned char*)pVhtHdr + ALIGN_TO_POW2((unsigned int)pTexelData, kAlignment);
 
 		pVhtHdr->m_nVersion	    = VHT_VERSION;
 		pVhtHdr->m_nChecksum    = m_StaticPropDict[m_StaticProps[i].m_ModelIdx].m_pStudioHdr->checksum;
@@ -1644,7 +1643,7 @@ void CVradStaticPropMgr::SerializeLighting()
 		{
 			HardwareTexels::MeshHeader_t *pMesh = pVhtHdr->pMesh(n);
 			pMesh->m_nLod = m_StaticProps[i].m_MeshData[n].m_nLod;
-			pMesh->m_nOffset = (unsigned long long)pTexelData - (unsigned long long)pVhtHdr;
+			pMesh->m_nOffset = (unsigned int)pTexelData - (unsigned int)pVhtHdr;
 			pMesh->m_nBytes = m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
 			pMesh->m_nWidth = m_StaticProps[i].m_LightmapImageWidth;
 			pMesh->m_nHeight = m_StaticProps[i].m_LightmapImageHeight;
@@ -1653,8 +1652,8 @@ void CVradStaticPropMgr::SerializeLighting()
 			pTexelData += m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
 		}
 
-		pTexelData = (unsigned char *)((unsigned long long)pTexelData - (unsigned long long)pVhtHdr);
-		pTexelData = (unsigned char*)pVhtHdr + ALIGN_TO_POW2((unsigned long long)pTexelData, kAlignment);
+		pTexelData = (unsigned char *)((unsigned int)pTexelData - (unsigned int)pVhtHdr);
+		pTexelData = (unsigned char*)pVhtHdr + ALIGN_TO_POW2((unsigned int)pTexelData, kAlignment);
 
 		AddBufferToPak(GetPakFile(), filename, (void*)pVhtHdr, pTexelData - (unsigned char*)pVhtHdr, false);
 	}
@@ -2464,8 +2463,8 @@ static int GetTexelCount(unsigned int _resX, unsigned int _resY, bool _mipmaps)
 	while (_resX > 1 || _resY > 1) 
 	{
 		retVal += _resX * _resY;
-		_resX = max(1u, _resX >> 1);
-		_resY = max(1u, _resY >> 1);
+		_resX = max(1, _resX >> 1);
+		_resY = max(1, _resY >> 1);
 	}
 
 	// Add in the 1x1 mipmap level, which wasn't hit above. This could be done in the initializer of 

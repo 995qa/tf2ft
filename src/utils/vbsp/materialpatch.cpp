@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 #include "vbsp.h"
-#include "utlbuffer.h"
+#include "UtlBuffer.h"
 #include "utlsymbol.h"
 #include "utlrbtree.h"
 #include "KeyValues.h"
