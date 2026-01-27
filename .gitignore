@@ -16,6 +16,8 @@ tfft/ServerConfig.vdf
 tfft/stats.txt
 GameState.txt
 viewed.res
+tfft/downloadlists
+tfft/voice_ban.dt
 
 
 # Visual Studio 
