@@ -13,6 +13,7 @@ tfft/cfg
 tfft/tf2_playerstats.dmx
 tfft/videoconfig*.cfg
 tfft/ServerConfig.vdf
+tfft/stats.txt
 GameState.txt
 viewed.res
 
