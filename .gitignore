@@ -18,7 +18,7 @@ GameState.txt
 viewed.res
 tfft/downloadlists
 tfft/voice_ban.dt
-
+game/platform
 
 # Visual Studio 
 *.suo
@@ -532,3 +532,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/game/tfft/cfg/local_loadout.txt
+/game/tfft/cfg/settings.scr
+/game/tfft/downloadlists
+/game/platform/config/InGameDialogConfig.vdf
+/game/tfft/ServerConfig.vdf
+/game/tfft/tf2_playerstats.dmx
