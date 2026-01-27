@@ -1690,10 +1690,9 @@ void CPlayerInventory::SOCacheSubscribed( const CSteamID & steamIDOwner, GCSDK::
 		return;
 	}
 
+
 	// add all the items already in the inventoryAdd commentMore actions
 	CSharedObjectTypeCache* pTypeCache = m_pSOCache->FindTypeCache(CEconItem::k_nTypeID);
-
-	if( pTypeCache )
 	{
 		for( uint32 unItem = 0; unItem < pTypeCache->GetCount(); unItem++ )
 		{
@@ -1726,8 +1725,6 @@ void CPlayerInventory::SOCacheSubscribed( const CSteamID & steamIDOwner, GCSDK::
 	}
 #endif
 }
-
-
 
 bool CInventoryManager::IsValidPlayerClass( equipped_class_t unClass )
 {

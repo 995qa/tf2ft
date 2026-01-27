@@ -137,14 +137,6 @@ void PromptOrFireCommand( const char* pszCommand )
 	}
 }
 
-void CQuit(bool bConfirmed, void* pContext)
-{
-	if (bConfirmed)
-	{
-		engine->ClientCmd_Unrestricted("quit");
-	}
-}
-
 void QuitorDisconnect(void)
 {
 	if (engine->IsInGame())
@@ -153,8 +145,7 @@ void QuitorDisconnect(void)
 	}
 	else
 	{
-		CHudMainMenuOverride* pMMOverride = (CHudMainMenuOverride*)(gViewPortInterface->FindPanelByName(PANEL_MAINMENUOVERRIDE));
-		ShowConfirmDialog("#MMenu_PromptQuit_Title", "#MMenu_PromptQuit_Body", "#TF_Coach_Yes", "#TF_Coach_No", CQuit, pMMOverride);
+		engine->ClientCmd("gamemenucommand quit");
 	}
 }
 static ConCommand tfft_quit("tfft_quit", QuitorDisconnect, "Disconnects if in-game, shows quit prompt when not.", FCVAR_NONE);
@@ -2029,12 +2020,6 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		m_hMutePlayerDialog->Activate();
 	}
-
-	else if (FStrEq("OpenQuickPlayDialog", command))
-	{
-		return;
-	}
-
 	else if ( FStrEq( "open_rank_type_menu", command ) )
 	{
 		if ( m_pRankTypeMenu )
