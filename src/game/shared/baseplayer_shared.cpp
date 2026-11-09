@@ -723,6 +723,12 @@ void CBasePlayer::PlayStepSound( Vector &vecOrigin, surfacedata_t *psurface, flo
 	}
 #endif
 
+	// If walking, footsteps are silent
+	if ( ( m_nButtons & IN_WALK ) && !force )
+	{
+		fvol = 0.0f;
+	}
+
 	EmitSound_t ep;
 	ep.m_nChannel = CHAN_BODY;
 	ep.m_pSoundName = params.soundname;

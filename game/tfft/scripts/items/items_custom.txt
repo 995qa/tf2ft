@@ -119,7 +119,6 @@
 			"attach_to_hands"	"1"
 			"used_by_classes"
 			{
-				"heavy" 	"secondary"
 				"sniper"	"secondary"
 			}
 			"mouse_pressed_sound"	"ui/item_light_gun_pickup.wav"
@@ -159,11 +158,6 @@
 				{
 					"attribute_class"	"add_maxhealth"
 					"value" "-15"
-				}
-				"maxammo secondary reduced"
-				{
-					"attribute_class"	"mult_maxammo_secondary"
-					"value" "0.80"
 				}
 				"crit mod disabled"
 				{
@@ -408,9 +402,6 @@
 				}
 			}
 		}
-
-
-		// DEV ITEMS, CHANGE MODITEM TO 0 BEFORE COMMIT
 	}
 	"attributes"
 	{

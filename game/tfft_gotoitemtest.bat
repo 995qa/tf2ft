@@ -1,0 +1,1 @@
+tfft_win64 -novid -console +map itemtest +sv_cheats 1

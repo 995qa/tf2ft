@@ -78,6 +78,8 @@ bool g_bMovementOptimizations = true;
 
 #define	NUM_CROUCH_HINTS	3
 
+int m_IsDucking = 0;
+
 extern IGameMovement *g_pGameMovement;
 
 #if defined( PLAYER_GETTING_STUCK_TESTING )
@@ -1082,6 +1084,12 @@ void CGameMovement::CheckParameters( void )
 	if ( mv->m_vecAngles[YAW] > 180.0f )
 	{
 		mv->m_vecAngles[YAW] -= 360.0f;
+	}
+
+	// If player is walking, slow the player
+	if (mv->m_nButtons & IN_WALK)
+	{
+		mv->m_flMaxSpeed *= 0.5f;
 	}
 }
 
