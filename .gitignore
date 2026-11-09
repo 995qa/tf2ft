@@ -532,9 +532,12 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# configs
 /game/tfft/cfg/local_loadout.txt
 /game/tfft/cfg/settings.scr
 /game/tfft/downloadlists
 /game/platform/config/InGameDialogConfig.vdf
 /game/tfft/ServerConfig.vdf
 /game/tfft/tf2_playerstats.dmx
+
