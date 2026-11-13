@@ -1,0 +1,5 @@
+@include "base.fgd"
+
+@PointClass base(Targetname) = tf_logic_br : "Battle Royale Entity, no real logic except that the game knows this is a BR map."
+[
+]

@@ -622,6 +622,8 @@ bool IsCreepWaveMode( void ) const;
 	bool IsPowerupMode( void ) { return m_bPowerupMode; }
 	void SetPowerupMode( bool bValue );
 
+	bool IsBRMode(void) const { return m_bPlayingBattleRoyale; }
+
 #ifdef GAME_DLL
 	// Managed competitive matches should go through the End/StopCompetitiveMatch path
 	void EndManagedMvMMatch( bool bKickPlayersToParties );
@@ -1123,6 +1125,8 @@ private:
 	CHandle< CRaidLogic >		m_hRaidLogic;
 	CHandle< CBossBattleLogic > m_hBossBattleLogic;
 #endif // TF_RAID_MODE
+
+	EHANDLE m_hBRoyaleEntity;
 	
 	int		m_nCurrencyAccumulator;
 	int		m_iCurrencyPool;
@@ -1185,6 +1189,8 @@ private:
 	CNetworkVar( bool, m_bPlayingMannVsMachine );
 	CNetworkVar( bool, m_bMannVsMachineAlarmStatus );
 	CNetworkVar( bool, m_bHaveMinPlayersToEnableReady );
+
+	CNetworkVar( bool, m_bPlayingBattleRoyale );
 
 	CNetworkVar( bool, m_bBountyModeEnabled );
 	CNetworkVar( bool, m_bCompetitiveMode );
@@ -1872,8 +1878,14 @@ private:
 	itemid_t			m_iBonusItemID;
 	CNetworkVarEmbedded( CEconItemView,	m_Item );
 };
-
 #ifdef GAME_DLL
+class CBRLogic : public CPointEntity
+{
+	DECLARE_CLASS(CBRLogic, CPointEntity);
+public:
+	DECLARE_DATADESC();
+};
+
 class CSingleUserReliableRecipientFilter : public CRecipientFilter
 {
 public:

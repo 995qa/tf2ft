@@ -85,6 +85,15 @@ bool CHudArenaPlayerCount::ShouldDraw( void )
 		}
 	}
 
+	// temporary
+	if (TFGameRules() && TFGameRules()->IsBRMode() && TFGameRules()->IsInWaitingForPlayers() == false)
+	{
+		if (TFGameRules()->State_Get() != GR_STATE_PREROUND)
+		{
+			return CHudElement::ShouldDraw();
+		}
+	}
+
 	return false;
 }
 

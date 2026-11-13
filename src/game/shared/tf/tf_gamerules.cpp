@@ -1089,6 +1089,7 @@ ConVar tf_gamemode_sd ( "tf_gamemode_sd", "0", FCVAR_REPLICATED | FCVAR_NOTIFY |
 ConVar tf_gamemode_rd ( "tf_gamemode_rd", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 ConVar tf_gamemode_pd ( "tf_gamemode_pd", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 ConVar tf_gamemode_tc ( "tf_gamemode_tc", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
+ConVar tf_gamemode_br( "tf_gamemode_br", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 ConVar tf_beta_content ( "tf_beta_content", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 ConVar tf_gamemode_payload ( "tf_gamemode_payload", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 ConVar tf_gamemode_mvm ( "tf_gamemode_mvm", "0", FCVAR_REPLICATED | FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
@@ -3196,6 +3197,9 @@ bool CTFGameRules::IsDefaultGameMode( void )
 	if ( IsInItemTestingMode() )
 		return false;
 
+	if ( IsBRMode() )
+		return false;
+
 
 #ifdef TF_RAID_MODE
 	if ( IsRaidMode() )
@@ -3397,6 +3401,7 @@ CTFGameRules::CTFGameRules()
 	m_bPlayingSpecialDeliveryMode.Set( false );
 	m_bPlayingRobotDestructionMode.Set( false );
 	m_bPowerupMode.Set( false );
+	m_bPlayingBattleRoyale.Set( false );
 
 	m_bHelltowerPlayersInHell.Set( false );
 	m_bIsUsingSpells.Set( false );
@@ -4236,6 +4241,7 @@ void CTFGameRules::Activate()
 	tf_gamemode_rd.SetValue( 0 );
 	tf_gamemode_pd.SetValue( 0 );
 	tf_gamemode_tc.SetValue( 0 );
+	tf_gamemode_br.SetValue( 0 );
 	tf_beta_content.SetValue( 0 );
 	tf_gamemode_passtime.SetValue( 0 );
 	tf_gamemode_misc.SetValue( 0 );
@@ -4257,6 +4263,7 @@ void CTFGameRules::Activate()
 	m_bPlayingSpecialDeliveryMode.Set( false );
 	m_bPlayingRobotDestructionMode.Set( false );
 	m_bPowerupMode.Set( false );
+	m_bPlayingBattleRoyale.Set( false );
 
 	m_redPayloadToPush = NULL;
 	m_bluePayloadToPush = NULL;
@@ -4417,6 +4424,15 @@ void CTFGameRules::Activate()
 	if ( pHolidayEntity )
 	{
 		m_nMapHolidayType.Set( pHolidayEntity->GetHolidayType() );
+	}
+
+	CBRLogic* pBRoyaleLogic = dynamic_cast<CBRLogic*> (gEntList.FindEntityByClassname(NULL, "tf_logic_br"));
+	if ( pBRoyaleLogic )
+	{
+		m_hBRoyaleEntity = pBRoyaleLogic;
+		m_nGameType.Set( TF_GAMETYPE_BR );
+		m_bPlayingBattleRoyale.Set( true );
+		tf_gamemode_br.SetValue( 1 );
 	}
 
 	// bot roster
@@ -19200,6 +19216,10 @@ const char *GetMapType( const char *mapName )
 		{
 			return "#Gametype_PlayerDestruction";
 		}
+		else if ( !Q_strnicmp( mapName, "br_", 3 ) )
+		{
+			return "#GameType_BattleRoyale";
+		}
 		else
 		{
 			if ( TFGameRules() )
@@ -22375,6 +22395,14 @@ void CTFGameRules::BroadcastSound( int iTeam, const char *sound, int iAdditional
 		gameeventmanager->FireEvent( event );
 	}
 }
+
+//-----------------------------------------------------------------------------
+// Purpose: Battle Royale logic entity
+//-----------------------------------------------------------------------------
+
+BEGIN_DATADESC(CBRLogic)
+END_DATADESC()
+LINK_ENTITY_TO_CLASS(tf_logic_br, CBRLogic);
 
 #define TF_GAMERULES_SCRIPT_FUNC( function, desc ) \
 	ScriptRegisterFunctionNamed( g_pScriptVM, Script##function, #function, desc )

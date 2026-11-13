@@ -554,6 +554,7 @@ const char* GetGameTypeID()
 	ConVarRef tf_gamemode_mvm( "tf_gamemode_mvm" );
 	ConVarRef tf_powerup_mode( "tf_powerup_mode" );
 	ConVarRef tf_gamemode_passtime( "tf_gamemode_passtime" );
+	ConVarRef tf_gamemode_br( "tf_gamemode_br" );
 
 	const char* pszGameTypeID = NULL;
 	if ( tf_gamemode_arena.GetBool() )
@@ -590,6 +591,10 @@ const char* GetGameTypeID()
 	else if ( tf_gamemode_passtime.GetBool() )
 	{
 		pszGameTypeID = "pass"; // intentionally not "passtime"
+	}
+	else if ( tf_gamemode_br.GetBool() )
+	{
+		pszGameTypeID = "br";
 	}
 	else
 	{

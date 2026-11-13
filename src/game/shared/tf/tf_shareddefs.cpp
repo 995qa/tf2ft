@@ -472,6 +472,7 @@ static const char *s_aGameTypeNames[] =
 	"#Gametype_RobotDestruction",
 	"#GameType_Passtime",
 	"#GameType_PlayerDestruction",
+	"#GameType_BattleRoyale",
 };
 COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == ARRAYSIZE( s_aGameTypeNames ) );
 
@@ -490,7 +491,8 @@ static const char *s_aEnumGameTypeName[] =
 	"TF_GAMETYPE_MVM",
 	"TF_GAMETYPE_RD",
 	"TF_GAMETYPE_PASSTIME",
-	"TF_GAMETYPE_PD"
+	"TF_GAMETYPE_PD",
+	"TF_GAMETYPE_BR",
 };
 COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == ARRAYSIZE( s_aEnumGameTypeName ) );
 
